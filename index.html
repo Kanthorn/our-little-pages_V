@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เป็นแฟนกันนะ 💕</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff7f9;color:#222}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.screen{display:none;width:min(94vw,520px);text-align:center}
+.screen.active{display:block}
+.card{background:white;border-radius:28px;padding:32px 22px;box-shadow:0 18px 50px rgba(0,0,0,.08)}
+h1{font-size:clamp(36px,10vw,56px);line-height:1.15;margin:0 0 28px}
+h2{font-size:clamp(27px,7vw,40px);line-height:1.3;margin:18px 4px 10px}
+p{font-size:20px;line-height:1.6;margin:12px 8px 0}
+img{width:100%;max-height:64vh;object-fit:contain;border-radius:24px;background:white;box-shadow:0 14px 38px rgba(0,0,0,.10)}
+.buttons,.quiz-options{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+button{border:0;border-radius:999px;padding:14px 24px;font-size:18px;font-weight:700;cursor:pointer;transition:.15s transform}
+button:active{transform:scale(.97)}
+.yes,.next,.quiz-btn{background:#ff4f7b;color:white}
+.no{background:#ececec;color:#333}
+.next{margin-top:22px;min-width:150px}.hidden{display:none}
+.quiz-title{font-size:30px;margin:0 0 8px}
+.quiz-sub{font-size:17px;color:#666;margin:0 0 24px}
+.quiz-btn{width:100%;max-width:320px}
+.reaction{min-height:58px;margin-top:20px;font-size:19px;font-weight:700;line-height:1.45}
+.progress{font-size:14px;color:#888;margin-bottom:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;padding:24px;z-index:10}
+.modal-box{width:min(90vw,390px);background:white;border-radius:24px;padding:28px 22px;text-align:center;box-shadow:0 18px 60px rgba(0,0,0,.2)}
+.modal-box h3{font-size:26px;margin:0 0 10px}
+.modal-box p{font-size:18px;margin:0 0 20px}
+.small{display:block;margin:14px auto 0;background:transparent;color:#777;font-size:15px;padding:8px 12px;font-weight:500;text-decoration:underline}
+.fade{animation:fadeIn .42s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.confetti{font-size:42px;letter-spacing:8px;margin:4px 0 12px}
+
+/* ===== AMAZING ANIMATED FINAL PAGE ===== */
+.final-stage{
+  position:relative;
+  overflow:hidden;
+  min-height:620px;
+  border-radius:30px;
+  padding:26px 18px 28px;
+  background:
+    radial-gradient(circle at 50% 72%, rgba(255,255,255,.92), rgba(255,241,246,.55) 36%, transparent 62%),
+    linear-gradient(180deg,#ffdce8 0%,#fff3f7 52%,#ffe7ef 100%);
+  box-shadow:0 20px 60px rgba(0,0,0,.12);
+}
+
+.final-heading{
+  position:relative;
+  z-index:6;
+  opacity:0;
+  transform:translateY(-10px);
+  animation:finalTitleIn .9s ease forwards;
+  animation-delay:5.5s;
+}
+.final-heading h2{
+  margin:0;
+  font-size:clamp(30px,7vw,44px);
+}
+.final-heading p{
+  margin-top:7px;
+  font-size:22px;
+  font-weight:700;
+}
+
+.final-scene{
+  position:relative;
+  height:400px;
+  margin-top:4px;
+}
+
+.otter{
+  position:absolute;
+  left:-140px;
+  bottom:62px;
+  font-size:112px;
+  z-index:4;
+  transform:rotate(-5deg);
+  animation:
+    otterWalkIn 1.5s cubic-bezier(.22,.8,.22,1) forwards .4s,
+    otterHug 1.05s ease forwards 4.1s;
+}
+
+.hamster{
+  position:absolute;
+  right:38px;
+  bottom:62px;
+  font-size:104px;
+  z-index:4;
+  opacity:0;
+  transform:scale(.65);
+  animation:
+    hamsterAppear .8s ease forwards 1.7s,
+    hamsterHug 1.05s ease forwards 4.1s,
+    happyBounce .55s ease 5.05s 2;
+}
+
+.bouquet{
+  position:absolute;
+  left:108px;
+  bottom:164px;
+  font-size:64px;
+  z-index:5;
+  opacity:0;
+  transform:rotate(-15deg);
+  animation:
+    bouquetAppear .45s ease forwards 1.9s,
+    bouquetGive 1.15s ease forwards 2.45s,
+    bouquetSettle .8s ease forwards 4.05s;
+}
+
+.speech{
+  position:absolute;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%) scale(.85);
+  background:white;
+  padding:10px 16px;
+  border-radius:20px;
+  font-size:18px;
+  font-weight:700;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+  opacity:0;
+  z-index:7;
+  white-space:nowrap;
+  animation:speechIn .55s ease forwards 2.75s, speechOut .45s ease forwards 3.65s;
+}
+
+.heart-float{
+  position:absolute;
+  z-index:3;
+  opacity:0;
+  font-size:30px;
+  animation:heartRise 2.6s ease-out forwards;
+}
+.h1{left:25%;bottom:130px;animation-delay:4.45s}
+.h2{left:46%;bottom:170px;animation-delay:4.7s}
+.h3{left:66%;bottom:132px;animation-delay:4.9s}
+.h4{left:38%;bottom:225px;animation-delay:5.05s}
+.h5{left:58%;bottom:240px;animation-delay:5.2s}
+
+.sparkle{
+  position:absolute;
+  opacity:0;
+  font-size:22px;
+  animation:sparklePop 1.4s ease-out forwards;
+}
+.s1{left:14%;top:32%;animation-delay:4.8s}
+.s2{right:15%;top:27%;animation-delay:5s}
+.s3{left:48%;top:20%;animation-delay:5.15s}
+
+.petals span{
+  position:absolute;
+  top:-30px;
+  font-size:20px;
+  opacity:.72;
+  animation:petalFall linear infinite;
+}
+.petals span:nth-child(1){left:7%;animation-duration:7s;animation-delay:.3s}
+.petals span:nth-child(2){left:22%;animation-duration:8.3s;animation-delay:1.2s}
+.petals span:nth-child(3){left:42%;animation-duration:7.4s;animation-delay:.7s}
+.petals span:nth-child(4){left:62%;animation-duration:8.8s;animation-delay:1.7s}
+.petals span:nth-child(5){left:81%;animation-duration:7.8s;animation-delay:.2s}
+.petals span:nth-child(6){left:92%;animation-duration:9.2s;animation-delay:1.4s}
+
+.final-note{
+  position:relative;
+  z-index:6;
+  margin-top:10px;
+  font-size:15px;
+  color:#956772;
+  opacity:0;
+  animation:fadeOnly 1s ease forwards 6.25s;
+}
+
+.replay{
+  position:relative;
+  z-index:6;
+  margin-top:18px;
+  opacity:0;
+  animation:fadeOnly 1s ease forwards 6.6s;
+}
+
+@keyframes otterWalkIn{
+  0%{left:-140px;transform:rotate(-5deg) translateY(0)}
+  35%{transform:rotate(-2deg) translateY(-9px)}
+  70%{transform:rotate(2deg) translateY(0)}
+  100%{left:78px;transform:rotate(0deg) translateY(0)}
+}
+@keyframes hamsterAppear{
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes bouquetAppear{
+  to{opacity:1}
+}
+@keyframes bouquetGive{
+  from{left:108px;bottom:164px;transform:rotate(-15deg)}
+  to{left:255px;bottom:150px;transform:rotate(8deg)}
+}
+@keyframes bouquetSettle{
+  to{left:216px;bottom:92px;transform:rotate(0deg)}
+}
+@keyframes otterHug{
+  to{left:140px;transform:rotate(4deg) scale(1.03)}
+}
+@keyframes hamsterHug{
+  to{right:104px;transform:rotate(-5deg) scale(1.04)}
+}
+@keyframes happyBounce{
+  0%,100%{transform:translateY(0) rotate(-5deg) scale(1.04)}
+  50%{transform:translateY(-10px) rotate(-5deg) scale(1.04)}
+}
+@keyframes speechIn{
+  to{opacity:1;transform:translateX(-50%) scale(1)}
+}
+@keyframes speechOut{
+  to{opacity:0;transform:translateX(-50%) translateY(-8px) scale(.95)}
+}
+@keyframes heartRise{
+  0%{opacity:0;transform:translateY(0) scale(.6)}
+  18%{opacity:1}
+  100%{opacity:0;transform:translateY(-125px) scale(1.3)}
+}
+@keyframes sparklePop{
+  0%{opacity:0;transform:scale(.2) rotate(0)}
+  35%{opacity:1;transform:scale(1.25) rotate(18deg)}
+  100%{opacity:0;transform:scale(.8) rotate(35deg)}
+}
+@keyframes petalFall{
+  0%{transform:translateY(-30px) rotate(0deg);opacity:0}
+  10%{opacity:.72}
+  100%{transform:translateY(680px) rotate(340deg);opacity:0}
+}
+@keyframes finalTitleIn{
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeOnly{
+  to{opacity:1}
+}
+
+@media (max-width:430px){
+  .final-stage{min-height:560px;padding:20px 12px 24px}
+  .final-scene{height:350px}
+  .otter{font-size:92px}
+  .hamster{font-size:86px}
+  .bouquet{font-size:52px}
+  @keyframes otterWalkIn{
+    0%{left:-120px;transform:rotate(-5deg)}
+    100%{left:38px;transform:rotate(0deg)}
+  }
+  @keyframes otterHug{
+    to{left:88px;transform:rotate(4deg) scale(1.03)}
+  }
+  @keyframes hamsterHug{
+    to{right:62px;transform:rotate(-5deg) scale(1.04)}
+  }
+  @keyframes bouquetGive{
+    from{left:82px;bottom:146px;transform:rotate(-15deg)}
+    to{left:205px;bottom:135px;transform:rotate(8deg)}
+  }
+  @keyframes bouquetSettle{
+    to{left:174px;bottom:85px;transform:rotate(0deg)}
+  }
+}
+
+
+/* ===== Heart game completion celebration ===== */
+#heartArena.completed{
+  background:linear-gradient(180deg,#fff0f5 0%,#ffe2ec 100%);
+}
+.heart-celebration{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  overflow:hidden;
+}
+.heart-celebration .otter-mini,
+.heart-celebration .hamster-mini{
+  position:absolute;
+  bottom:88px;
+  font-size:76px;
+  opacity:0;
+  z-index:3;
+}
+.heart-celebration .otter-mini{
+  left:-90px;
+  animation:miniOtterIn .9s cubic-bezier(.2,.8,.2,1) forwards;
+}
+.heart-celebration .hamster-mini{
+  right:-90px;
+  animation:miniHamsterIn .9s cubic-bezier(.2,.8,.2,1) forwards .25s;
+}
+.heart-celebration .big-heart{
+  position:absolute;
+  top:82px;
+  font-size:58px;
+  opacity:0;
+  transform:scale(.4);
+  animation:bigHeartPop .65s ease forwards .85s,
+            heartPulse .8s ease-in-out 1.5s 2;
+  z-index:4;
+}
+.heart-celebration .love-text{
+  position:absolute;
+  bottom:34px;
+  left:0;
+  right:0;
+  font-size:22px;
+  font-weight:800;
+  color:#ff4f7b;
+  opacity:0;
+  transform:translateY(8px);
+  animation:loveTextIn .6s ease forwards 1.35s;
+}
+.heart-celebration .tiny-heart{
+  position:absolute;
+  bottom:130px;
+  font-size:24px;
+  opacity:0;
+  animation:tinyHeartFloat 1.9s ease-out forwards;
+}
+.heart-celebration .th1{left:30%;animation-delay:1.15s}
+.heart-celebration .th2{left:46%;animation-delay:1.35s}
+.heart-celebration .th3{left:62%;animation-delay:1.55s}
+.heart-celebration .spark{
+  position:absolute;
+  font-size:20px;
+  opacity:0;
+  animation:sparkPop 1.2s ease-out forwards;
+}
+.heart-celebration .sp1{left:18%;top:25%;animation-delay:1.0s}
+.heart-celebration .sp2{right:18%;top:28%;animation-delay:1.2s}
+.heart-celebration .sp3{left:49%;top:18%;animation-delay:1.4s}
+
+@keyframes miniOtterIn{
+  0%{left:-90px;opacity:0;transform:rotate(-8deg)}
+  100%{left:78px;opacity:1;transform:rotate(0)}
+}
+@keyframes miniHamsterIn{
+  0%{right:-90px;opacity:0;transform:rotate(8deg)}
+  100%{right:78px;opacity:1;transform:rotate(0)}
+}
+@keyframes bigHeartPop{
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes heartPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.18)}
+}
+@keyframes loveTextIn{
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes tinyHeartFloat{
+  0%{opacity:0;transform:translateY(0) scale(.6)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translateY(-95px) scale(1.25)}
+}
+@keyframes sparkPop{
+  0%{opacity:0;transform:scale(.2) rotate(0)}
+  35%{opacity:1;transform:scale(1.25) rotate(20deg)}
+  100%{opacity:0;transform:scale(.8) rotate(45deg)}
+}
+@media (max-width:430px){
+  .heart-celebration .otter-mini,
+  .heart-celebration .hamster-mini{font-size:66px}
+  @keyframes miniOtterIn{
+    0%{left:-80px;opacity:0;transform:rotate(-8deg)}
+    100%{left:52px;opacity:1;transform:rotate(0)}
+  }
+  @keyframes miniHamsterIn{
+    0%{right:-80px;opacity:0;transform:rotate(8deg)}
+    100%{right:52px;opacity:1;transform:rotate(0)}
+  }
+}
+
+
+#page1 .card{position:relative;overflow:visible} #page1 .buttons{position:relative;min-height:90px;align-items:center}
+#yesBtn{position:relative;z-index:3;transform-origin:center;transition:transform .25s ease}
+#noBtn{z-index:20;transition:left .13s ease,top .13s ease,transform .13s ease;touch-action:none}
+#noBtn.dodging{position:fixed;margin:0}
+#noCounter{margin-top:12px;min-height:24px;color:#a26a79;font-size:15px;font-weight:700}
+#bombLayer{position:fixed;inset:0;z-index:99;display:none;align-items:center;justify-content:center;pointer-events:none}
+#bombLayer.show{display:flex}.bomb{font-size:96px;animation:shake .14s infinite}.bomb-count{text-align:center;font-size:34px;font-weight:900;color:#ff4f7b}
+.explosion{font-size:130px;animation:boom .65s forwards}
+#page1.yes-only #yesBtn{font-size:30px;padding:22px 46px;animation:yesBeat .8s infinite}
+.optout{display:block;margin:16px auto 0;background:transparent;color:#999;font-size:13px;padding:8px;text-decoration:underline;font-weight:500}
+@keyframes shake{50%{transform:rotate(8deg)}0%,100%{transform:rotate(-8deg)}} @keyframes boom{0%{transform:scale(.3)}50%{transform:scale(1.4)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes yesBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+
+
+/* ===== NEW CUTE HEART CHASE GAME ===== */
+#heartGame .card{
+  padding:26px 18px 24px;
+  overflow:hidden;
+}
+.heart-game-title{
+  font-size:clamp(31px,8vw,44px);
+  font-weight:800;
+  margin:0 0 4px;
+}
+.heart-game-sub{
+  font-size:18px;
+  color:#8a6c74;
+  margin:0 0 15px;
+}
+.heart-stage{
+  position:relative;
+  height:390px;
+  overflow:hidden;
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 50% 25%,rgba(255,255,255,.92),transparent 32%),
+    linear-gradient(180deg,#fff8fa 0%,#ffeef3 100%);
+  border:2px solid #ffe1ea;
+  box-shadow:inset 0 8px 30px rgba(255,120,155,.06);
+}
+.heart-stage::before{
+  content:"";
+  position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle at 14% 20%,rgba(255,125,155,.13) 0 3px,transparent 4px),
+    radial-gradient(circle at 82% 16%,rgba(255,125,155,.11) 0 4px,transparent 5px),
+    radial-gradient(circle at 72% 78%,rgba(255,125,155,.10) 0 3px,transparent 4px),
+    radial-gradient(circle at 22% 76%,rgba(255,125,155,.11) 0 4px,transparent 5px);
+  pointer-events:none;
+}
+.chase-otter{
+  position:absolute;
+  left:24px;
+  bottom:28px;
+  font-size:82px;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.08));
+  transform-origin:50% 100%;
+  transition:left .42s cubic-bezier(.2,.8,.2,1), top .42s cubic-bezier(.2,.8,.2,1), transform .28s ease;
+  z-index:2;
+  user-select:none;
+}
+.chase-otter.run{animation:otterRun .42s ease}
+@keyframes otterRun{
+  0%,100%{transform:rotate(0) scale(1)}
+  35%{transform:rotate(-8deg) translateY(-8px) scale(1.04)}
+  70%{transform:rotate(7deg) translateY(1px)}
+}
+.chase-heart{
+  position:absolute;
+  left:61%;
+  top:42%;
+  width:84px;height:84px;
+  padding:0;border:0;background:transparent;
+  font-size:66px;line-height:1;
+  z-index:4;
+  cursor:pointer;
+  transition:left .35s cubic-bezier(.22,.8,.22,1), top .35s cubic-bezier(.22,.8,.22,1), transform .28s ease, opacity .25s ease;
+  filter:drop-shadow(0 9px 14px rgba(255,75,120,.18));
+  touch-action:manipulation;
+}
+.chase-heart::after{
+  content:"♡";
+  position:absolute;
+  right:-10px;top:-9px;
+  font-size:21px;color:#ff7898;
+  animation:miniPulse .75s ease-in-out infinite;
+}
+@keyframes miniPulse{50%{transform:scale(1.35);opacity:.65}}
+.chase-heart.escape{animation:heartWiggle .38s ease}
+@keyframes heartWiggle{
+  0%,100%{transform:rotate(0) scale(1)}
+  30%{transform:rotate(-12deg) scale(1.08)}
+  70%{transform:rotate(11deg) scale(.96)}
+}
+.game-bubble{
+  position:absolute;
+  left:18px;top:18px;
+  padding:9px 13px;
+  background:white;
+  border:2px solid #ffd9e5;
+  border-radius:18px;
+  font-size:15px;
+  font-weight:700;
+  color:#a45c70;
+  box-shadow:0 8px 18px rgba(0,0,0,.05);
+  z-index:3;
+  max-width:190px;
+  text-align:left;
+}
+.game-bubble::after{
+  content:"";
+  position:absolute;left:22px;bottom:-9px;
+  border:9px solid transparent;border-top-color:#ffd9e5;
+}
+.heart-progress{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin:16px 0 2px;
+}
+.heart-progress span{
+  width:11px;height:11px;border-radius:50%;
+  background:#e7dfe2;
+  transition:.25s ease;
+}
+.heart-progress span.on{
+  background:#ff5d86;
+  transform:scale(1.18);
+}
+.heart-status{
+  min-height:58px;
+  margin-top:8px;
+  font-size:20px;
+  font-weight:800;
+  color:#4b3f43;
+}
+.heart-final-wrap{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+  z-index:10;
+}
+.heart-grow{
+  font-size:72px;
+  opacity:0;
+  animation:heartGrowBoom 2.15s cubic-bezier(.16,.84,.3,1) forwards;
+  filter:drop-shadow(0 16px 24px rgba(255,70,120,.24));
+}
+@keyframes heartGrowBoom{
+  0%{opacity:1;transform:scale(.7)}
+  22%{transform:scale(1.05)}
+  46%{transform:scale(1.55)}
+  70%{transform:scale(2.4)}
+  86%{opacity:1;transform:scale(3.4)}
+  100%{opacity:0;transform:scale(4.7)}
+}
+.heart-boom{
+  position:absolute;
+  font-size:115px;
+  opacity:0;
+  animation:heartBoom .75s ease-out forwards 1.85s;
+}
+@keyframes heartBoom{
+  0%{opacity:0;transform:scale(.3)}
+  35%{opacity:1;transform:scale(1.3)}
+  100%{opacity:0;transform:scale(2.1)}
+}
+.flying-heart{
+  position:absolute;
+  font-size:30px;
+  opacity:0;
+  animation:flyHeart 2.4s ease-out forwards;
+}
+@keyframes flyHeart{
+  0%{opacity:0;transform:translate(0,0) scale(.5) rotate(0)}
+  15%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.35) rotate(var(--rot))}
+}
+.heart-game-done{
+  position:absolute;
+  left:0;right:0;bottom:26px;
+  font-size:23px;
+  font-weight:900;
+  color:#ff4f7b;
+  opacity:0;
+  animation:doneIn .6s ease forwards 2.25s;
+}
+@keyframes doneIn{to{opacity:1;transform:translateY(-3px)}}
+
+@media(max-width:430px){
+  .heart-stage{height:370px}
+  .chase-otter{font-size:72px}
+  .chase-heart{font-size:60px;width:78px;height:78px}
+}
+
+</style>
+</head>
+<body>
+
+<section id="page1" class="screen active">
+  <div class="card">
+    <h1>เป็นแฟนกันนะ💕</h1>
+    <div class="buttons">
+      <button id="yesBtn" class="yes" onclick="startHeartGame()">Yes 💕</button>
+      <button id="noBtn" class="no">No</button>
+    </div>
+    <div id="noCounter"></div>
+</div>
+</section>
+<div id="bombLayer"><div id="bombWrap"><div class="bomb">💣</div><div id="bombCount" class="bomb-count">3</div></div></div>
+
+<!-- HEART GAME -->
+<section id="heartGame" class="screen">
+  <div class="card">
+    <div class="heart-game-title">จับหัวใจเราให้ได้ ❤️</div>
+    <div class="heart-game-sub">ลองจับดูสิ 😚</div>
+
+    <div id="heartArena" class="heart-stage">
+      <div id="gameBubble" class="game-bubble">แตะหัวใจเลยนะ ♡</div>
+      <div id="chaseOtter" class="chase-otter">🦦</div>
+      <button id="movingHeart" class="chase-heart" aria-label="จับหัวใจ">❤️</button>
+    </div>
+
+    <div class="heart-progress" id="heartProgress">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div id="heartScore" class="heart-status">พร้อมยัง? 😏</div>
+    <button id="heartNext" class="next hidden" onclick="goTo('game1')">ต่อไป 💕</button>
+  </div>
+</section>
+
+<!-- QUIZ 1 -->
+<section id="game1" class="screen">
+  <div class="card">
+    <div class="quiz-title">ใครเป็นคนเริ่มอ่อยก่อน? 😏</div>
+    <div class="quiz-sub">เลือกดีๆนะ...</div>
+    <div class="quiz-options">
+      <button class="quiz-btn" onclick="answer1('me')">เรา</button>
+      <button class="quiz-btn" onclick="answer1('her')">เธอ</button>
+      <button class="quiz-btn" onclick="answer1('tokyo')">ขนมโตเกียว 🌯</button>
+    </div>
+    <div id="reaction1" class="reaction"></div>
+    <button id="quizNext" class="next hidden" onclick="goTo('page2')">ต่อไป 💕</button>
+  </div>
+</section>
+
+<!-- TOKYO -->
+<section id="page2" class="screen">
+  <img src="tokyo.jpeg" alt="ขนมโตเกียว">
+  <div class="card" style="margin-top:18px">
+    <p>เรารู้นะเธออ่อยเราด้วยขนมโตเกียว🤣<br>
+    <button class="next" onclick="goTo('page3')">ต่อไป 💕</button>
+  </div>
+</section>
+
+<!-- ADMIRE -->
+<section id="page3" class="screen">
+  <img src="admire.jpeg" alt="Her photo">
+  <div class="card" style="margin-top:18px">
+    <p>เธอเป็นผู้หญิงที่ทั้งน่ารัก สวย เก่งและฉลาด แถมยังขยันมากๆ
+    สักวันนึงเธอต้องประสบความสำเร็จแบบที่เธอตั้งเป้าไว้แน่นอน 💕</p>
+    <button class="next" onclick="goTo('page4')">ต่อไป 💕</button>
+  </div>
+</section>
+
+<!-- FUNNY -->
+<section id="page4" class="screen">
+  <img src="funny.jpeg" alt="Her funny moment">
+  <div class="card" style="margin-top:18px">
+    <p>ถึงแม้บางครั้งเธอจะชอบทำไรบ้าๆบอๆ อยู่บ้าง
+    แต่เราก็รักเธอนะ😚</p>
+    <button class="next" onclick="goTo('page5')">ต่อไป 💕</button>
+  </div>
+</section>
+
+<!-- I LOVE YOU 3000 -->
+<section id="page5" class="screen">
+  <img src="her.jpeg" alt="Her photo">
+  <div class="card" style="margin-top:18px">
+    <h2>I Love You Veesayaporn❤️</h2>
+    <button class="next" onclick="goTo('page6')">ต่อไป 💕</button>
+  </div>
+</section>
+
+<!-- FINAL -->
+<section id="page6" class="screen">
+  <div class="final-stage">
+    <div class="petals">
+      <span>🌸</span><span>🌸</span><span>🌸</span>
+      <span>🌸</span><span>🌸</span><span>🌸</span>
+    </div>
+
+    <div class="final-scene">
+      <div class="speech">ดอกไม้นี้ให้เธอนะ 💐</div>
+
+      <div class="otter">🦦</div>
+      <div class="bouquet">💐</div>
+      <div class="hamster">🐹</div>
+
+      <div class="heart-float h1">💕</div>
+      <div class="heart-float h2">❤️</div>
+      <div class="heart-float h3">💗</div>
+      <div class="heart-float h4">💖</div>
+      <div class="heart-float h5">💞</div>
+
+      <div class="sparkle s1">✨</div>
+      <div class="sparkle s2">✨</div>
+      <div class="sparkle s3">✨</div>
+    </div>
+
+    <div class="final-heading">
+      <h2>เป็นแฟนกันอย่างเป็นทางการแล้วนะ 💕</h2>
+      <p>Officially us. 🦦🐹</p>
+    </div>
+
+    <div class="final-note">And so our story continues... ❤️</div>
+
+    <button class="next replay" onclick="replayFinal()">ดูอีกครั้ง 💕</button>
+  </div>
+</section>
+
+<!-- NO POPUP -->
+<div id="noModal" class="modal">
+  <div class="modal-box">
+    <h3>แน่ใจหรอ 🥺</h3>
+    <p>ลองคิดอีกทีได้มั้ย… กด Yes แล้วน่ารักกว่านะ 💕</p>
+    <button class="yes" onclick="startHeartGame()">โอเค Yes 💕</button>
+    <button class="small" onclick="realNo()">No, จริงๆ</button>
+  </div>
+</div>
+
+<script>
+
+
+/* ===== FIRST PAGE: NO RUNS AWAY ===== */
+let noAttempts = 0;
+let noBusy = false;
+
+function dodgeNo(e){
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+  if(noBusy || noAttempts >= 10) return;
+
+  noAttempts++;
+
+  const yes = document.getElementById('yesBtn');
+  const no = document.getElementById('noBtn');
+  const counter = document.getElementById('noCounter');
+
+  // Yes gets larger after every attempted No.
+  yes.style.transform = `scale(${Math.min(1 + noAttempts * 0.09, 1.82)})`;
+
+  if(noAttempts >= 10){
+    noBusy = true;
+    counter.textContent = 'โอ๊ะ... 💣';
+    explodeNo();
+    return;
+  }
+
+  no.classList.add('dodging');
+
+  const rect = no.getBoundingClientRect();
+  const pad = 18;
+  const maxX = Math.max(pad, window.innerWidth - rect.width - pad);
+  const maxY = Math.max(100, window.innerHeight - rect.height - 55);
+
+  let x = pad + Math.random() * Math.max(1, maxX - pad);
+  let y = 90 + Math.random() * Math.max(1, maxY - 90);
+
+  no.style.left = Math.round(x) + 'px';
+  no.style.top = Math.round(y) + 'px';
+  no.style.transform = `rotate(${Math.round(Math.random()*20 - 10)}deg)`;
+
+  const messages = [
+    'เกือบแล้ว 😝',
+    'จับไม่ทันหรอก 🤣',
+    'No หนีแล้ว 💨',
+    'Yes ใหญ่ขึ้นอีกนิด 💕',
+    'ยังจะตามอีกเหรอ 😆',
+    'หนีต่อออ 💨',
+    'ใกล้ถึงระเบิดแล้วนะ 👀',
+    'อีกนิดเดียว 💣',
+    'ครั้งหน้าแล้วนะ... 😳'
+  ];
+  counter.textContent = messages[noAttempts - 1] || '';
+}
+
+async function explodeNo(){
+  const no = document.getElementById('noBtn');
+  const layer = document.getElementById('bombLayer');
+  const wrap = document.getElementById('bombWrap');
+  const count = document.getElementById('bombCount');
+
+  no.style.pointerEvents = 'none';
+  layer.classList.add('show');
+
+  for(const n of ['3','2','1']){
+    count.textContent = n;
+    await new Promise(r => setTimeout(r,430));
+  }
+
+  wrap.innerHTML = '<div class="explosion">💥</div>';
+  await new Promise(r => setTimeout(r,620));
+
+  layer.classList.remove('show');
+  no.style.display = 'none';
+
+  document.getElementById('page1').classList.add('yes-only');
+  document.getElementById('yesBtn').style.transform = '';
+  document.getElementById('noCounter').textContent = 'Yes 💕';
+}
+
+function setupNoButton(){
+  const no = document.getElementById('noBtn');
+  if(!no) return;
+
+  // Works with iPhone touch, mouse, and stylus.
+  no.addEventListener('pointerdown', dodgeNo, {passive:false});
+
+  no.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' '){
+      dodgeNo(e);
+    }
+  });
+}
+
+window.addEventListener('DOMContentLoaded', setupNoButton);
+
+let heartCount = 0;
+let heartGameLocked = false;
+
+function startHeartGame(){
+  heartCount = 0;
+  heartGameLocked = false;
+
+  const arena = document.getElementById('heartArena');
+  arena.innerHTML = `
+    <div id="gameBubble" class="game-bubble">แตะหัวใจเลยนะ ♡</div>
+    <div id="chaseOtter" class="chase-otter">🦦</div>
+    <button id="movingHeart" class="chase-heart" aria-label="จับหัวใจ">❤️</button>
+  `;
+
+  document.getElementById('heartScore').textContent = 'พร้อมยัง? 😏';
+  document.getElementById('heartNext').classList.add('hidden');
+  document.querySelectorAll('#heartProgress span').forEach(x=>x.classList.remove('on'));
+
+  goTo('heartGame');
+
+  requestAnimationFrame(()=>{
+    const heart = document.getElementById('movingHeart');
+    heart.addEventListener('pointerdown', tryCatchHeart, {passive:false});
+  });
+}
+
+function tryCatchHeart(e){
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+  if(heartGameLocked) return;
+
+  // First 3 attempts: the heart escapes.
+  if(heartCount < 3){
+    heartCount++;
+    updateHeartProgress(heartCount);
+
+    const messages = [
+      'อ้าวว วิ่งหนีแล้ว! 555 😂',
+      'เกือบได้แล้วนะ! ยังเร็วไปอีก~ 😝',
+      'อีกนิดเดียว! ครั้งสุดท้ายแล้วนะ 👀💕'
+    ];
+    document.getElementById('heartScore').textContent = messages[heartCount-1];
+
+    moveEscapingHeart();
+
+    if(heartCount === 1) document.getElementById('gameBubble').textContent = 'เร็วไปปป~ 💨';
+    if(heartCount === 2) document.getElementById('gameBubble').textContent = 'ยังจับไม่ได้หรอก 😚';
+    if(heartCount === 3) document.getElementById('gameBubble').textContent = 'คราวนี้ลองอีกที 💕';
+    return;
+  }
+
+  // 4th attempt: let her "catch" it, then grow and explode into hearts.
+  heartCount = 4;
+  updateHeartProgress(4);
+  heartGameLocked = true;
+  finalHeartExplosion();
+}
+
+function moveEscapingHeart(){
+  const arena = document.getElementById('heartArena');
+  const heart = document.getElementById('movingHeart');
+  const otter = document.getElementById('chaseOtter');
+
+  if(!arena || !heart || !otter) return;
+
+  heart.classList.remove('escape');
+  void heart.offsetWidth;
+  heart.classList.add('escape');
+
+  const hw = 82, hh = 82;
+  const safeTop = 72;
+  const safeBottom = 36;
+  const maxX = Math.max(20, arena.clientWidth - hw - 18);
+  const maxY = Math.max(safeTop, arena.clientHeight - hh - safeBottom);
+
+  let x = 20 + Math.random() * Math.max(1, maxX - 20);
+  let y = safeTop + Math.random() * Math.max(1, maxY - safeTop);
+
+  heart.style.left = Math.round(x) + 'px';
+  heart.style.top = Math.round(y) + 'px';
+
+  // Otter chases toward the previous/current heart region.
+  const ox = Math.max(16, Math.min(arena.clientWidth - 110, x - 95));
+  const oy = Math.max(135, Math.min(arena.clientHeight - 105, y + 35));
+  otter.style.left = Math.round(ox) + 'px';
+  otter.style.top = Math.round(oy) + 'px';
+  otter.style.bottom = 'auto';
+  otter.classList.remove('run');
+  void otter.offsetWidth;
+  otter.classList.add('run');
+}
+
+function updateHeartProgress(n){
+  document.querySelectorAll('#heartProgress span').forEach((el,i)=>{
+    el.classList.toggle('on', i < n);
+  });
+}
+
+function finalHeartExplosion(){
+  const arena = document.getElementById('heartArena');
+  const heart = document.getElementById('movingHeart');
+  const otter = document.getElementById('chaseOtter');
+  const bubble = document.getElementById('gameBubble');
+
+  if(heart) heart.style.display = 'none';
+  if(otter){
+    otter.style.left = 'calc(50% - 92px)';
+    otter.style.top = 'auto';
+    otter.style.bottom = '28px';
+    otter.style.transform = 'scale(1.08)';
+  }
+  if(bubble) bubble.textContent = 'จับได้แล้ว... 😳';
+
+  document.getElementById('heartScore').textContent = 'อุ๊ย... มันใหญ่ขึ้นเรื่อยๆ! 💕';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'heart-final-wrap';
+  wrap.innerHTML = `
+    <div class="heart-grow">❤️</div>
+    <div class="heart-boom">💥</div>
+    <div class="heart-game-done">จับได้แล้ว ห้ามปล่อยแล้วนะ 🤣💕</div>
+  `;
+  arena.appendChild(wrap);
+
+  const hearts = ['💕','💗','💖','❤️','💞','💓','💘','💝','💟','💗','💕','❤️','💖','💞'];
+  hearts.forEach((symbol,i)=>{
+    const h = document.createElement('div');
+    h.className = 'flying-heart';
+    h.textContent = symbol;
+    h.style.left = (46 + Math.random()*8) + '%';
+    h.style.top = (45 + Math.random()*10) + '%';
+    h.style.setProperty('--dx', ((Math.random()*420)-210) + 'px');
+    h.style.setProperty('--dy', ((Math.random()*360)-180) + 'px');
+    h.style.setProperty('--rot', ((Math.random()*260)-130) + 'deg');
+    h.style.animationDelay = (1.95 + i*0.045) + 's';
+    wrap.appendChild(h);
+  });
+
+  setTimeout(()=>{
+    document.getElementById('heartScore').textContent = 'จับได้แล้ว ห้ามปล่อยแล้วนะ 🤣💕';
+    document.getElementById('heartNext').classList.remove('hidden');
+  }, 2850);
+}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','fade'));
+  document.getElementById('noModal').style.display='none';
+  const el=document.getElementById(id);
+  el.classList.add('active','fade');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function openNo(){document.getElementById('noModal').style.display='flex'}
+function realNo(){
+  document.getElementById('noModal').innerHTML=`
+    <div class="modal-box">
+      <h3>โอเค 💛</h3>
+      <p>ขอบคุณที่ตอบตรงๆนะ</p>
+      <button class="small" onclick="location.reload()">กลับหน้าแรก</button>
+    </div>`;
+}
+function answer1(choice){
+  const r=document.getElementById('reaction1');
+  if(choice==='tokyo'){
+    r.innerHTML='ถูกต้อง! ตัวการใหญ่คือขนมโตเกียว 🤣💕';
+  }else if(choice==='her'){
+    r.innerHTML='อืมมม... เราก็คิดแบบนั้นนะ 😏🤣';
+  }else{
+    r.innerHTML='มั่นใจมากนะเรา 😂 แต่หลักฐานคือขนมโตเกียว!';
+  }
+  document.getElementById('quizNext').classList.remove('hidden');
+}
+
+
+function replayFinal(){
+  const finalPage = document.getElementById('page6');
+  finalPage.classList.remove('active','fade');
+  void finalPage.offsetWidth;   // force animation reset
+  finalPage.classList.add('active','fade');
+}
+
+</script>
+</body>
+</html>
