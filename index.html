@@ -745,8 +745,23 @@ function dodgeNo(e){
   const maxX = Math.max(pad, window.innerWidth - rect.width - pad);
   const maxY = Math.max(100, window.innerHeight - rect.height - 55);
 
-  let x = pad + Math.random() * Math.max(1, maxX - pad);
-  let y = 90 + Math.random() * Math.max(1, maxY - 90);
+  let x, y;
+let tries = 0;
+
+const yesRect = yes.getBoundingClientRect();
+
+do {
+  x = pad + Math.random() * Math.max(1, maxX - pad);
+  y = 90 + Math.random() * Math.max(1, maxY - 90);
+  tries++;
+
+} while (
+  tries < 50 &&
+  x < yesRect.right + 80 &&
+  x + rect.width > yesRect.left - 110 &&
+  y < yesRect.bottom + 80 &&
+  y + rect.height > yesRect.top - 110
+);
 
   no.style.left = Math.round(x) + 'px';
   no.style.top = Math.round(y) + 'px';
